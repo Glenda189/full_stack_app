@@ -1,20 +1,27 @@
-import { Link } from 'react-router-dom';
+import {useContext} from 'react';
+import { UserContext } from "../context/UserContext";
 
-const Header = ({ authUser }) => {
+function Header() {
+  const { authUser, signOut } = useContext(UserContext);
+
+  const handleSignOut = (e) => {
+    e.preventDefault();
+    signOut();
+  };
   return (
     <header>
       <div className="wrap header--flex">
-        <h1 className="header--logo"><Link to="/">Courses</Link></h1>
+        <h1 className="header--logo"><a href="/">Courses</a></h1>
         <nav>
         {authUser ? (
         <ul className="header--signedin">
            <li>Welcome, {authUser.firstName} {authUser.lastName}!</li>
-          <li><Link to="/signout">Sign Out</Link></li>
+           <li><a href="/signout" onClick={handleSignOut}>Sign Out</a></li>
            </ul>
       ) : (
         <ul className="header--signedout">
-          <li><Link to="/signup">Sign Up</Link></li>
-          <li><Link to="/signin">Sign In</Link></li>
+          <li><a href="/signup">Sign Up</a></li>
+          <li><a href="/signin">Sign In</a></li>
           </ul>
              )}
         </nav>

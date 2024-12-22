@@ -1,16 +1,16 @@
 import { useState, useContext } from "react";
-import { UserContext } from "../UserContext";
+import { UserContext } from "../context/UserContext";
 import { useNavigate} from 'react-router-dom';
 
-const SignIn = ()=> {
-    const { actions } = useContext(UserContext);
+function SignIn(){
+    const { signIn} = useContext(UserContext);
     const [ userEmail, setUserEmail] = useState('');
     const [ userPassword, setUserPassword] = useState('');
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const user = await actions.signIn(userEmail, userPassword);
+        const user = await signIn(userEmail, userPassword);
         if(user) {
             navigate('/');
         } else {

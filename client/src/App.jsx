@@ -1,20 +1,24 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter,Routes, Route} from 'react-router-dom';
 import Header from './components/Header';
 import Courses from './components/Courses';
 import CourseDetail from './components/CourseDetail';
+import SignIn from './components/SignIn';
+import SignUp from './components/SignUp';
 
 
 
 
-const App = () => {
+function App() {
   return (
-    <Router>
+  <BrowserRouter>
       <Header authUser={null} />
       <Routes>
         <Route path="/" element={<Courses />} />
         <Route path="/courses/:id" element={<CourseDetail />} />
+        <Route path="/signin" element={< SignIn />} />
+        <Route path="/signup" element={< SignUp />} />
       </Routes>
-    </Router>
+      </BrowserRouter>
   );
 };
 

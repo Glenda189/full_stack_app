@@ -1,12 +1,15 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
+import ReactDOM from 'react-dom/client';
+
+
 import './reset.css'
 import './global.css'
 
-import App from './App.jsx'
+import UserProvider  from './context/UserProvider';
 
-createRoot(document.getElementById('root')).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-)
+import App from './App';
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <UserProvider>
+      <App />
+  </UserProvider>
+);
