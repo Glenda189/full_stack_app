@@ -1,39 +1,84 @@
-import { useState, useContext } from "react";
-import { UserContext } from "../context/UserContext";
-import { useNavigate} from 'react-router-dom';
+// sign in form for users to sign in 
 
-function SignIn(){
-    const { signIn} = useContext(UserContext);
-    const [ userEmail, setUserEmail] = useState('');
-    const [ userPassword, setUserPassword] = useState('');
+
+import { useState, useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import UserContext from "../context/UserContext";
+
+const SignIn = () => {
+    const { signIn } = useContext(UserContext);
     const navigate = useNavigate();
+    const [emailAddress, setEmailAddress] = useState("");
+    const [password, setPassword] = useState("");
+    const [errors, setErrors] = useState([]);
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
-        const user = await signIn(userEmail, userPassword);
-        if(user) {
-            navigate('/');
+      e.preventDefault();
+      try {
+        const user = await signIn(emailAddress, password);
+          if (user) {
+          console.log("Sign-in successful:", user);
+          navigate("/"); // Redirect to homepage
         } else {
-            alert('Sign In failed. Check your credentials.');
+          setErrors(["Sign-in was unsuccessful. Please check your credentials."]);
         }
-    };
-    return (
-    <div className="form--centered">
-      <h2>Sign In</h2>
-      <form onSubmit={handleSubmit}>
-        <label htmlFor="emailAddress">Email Address</label>
-        <input id="emailAddress" type="email" value={userEmail} onChange={e=>setUserEmail(e.target.value)} required />
-       
-        <label htmlFor="password">Password</label>
-        <input id="password" type="password" value={userPassword}onChange={e=>setUserPassword(e.target.value)} required />
-       
-        <button className="button" type="submit">Sign In</button>
-        <button className="button button-secondary" onClick={e=>{e.preventDefault(); navigate('/');}}>Cancel</button>
-        </form>
+        } catch (error) {
+          console.error("Error during sign-in:", error);
+          navigate("/error"); // Redirect to error page
+    }
+  };
 
-        <p> Need a user account? <a href="/signup">Sign Up</a>!</p>
+
+
+  // Mock up example as provided 
+    return (
+      <div className="form--centered">
+      <h2>Sign In</h2>
+      {errors.length > 0 && (
+        <div className="validation--errors">
+          <h3>Validation Errors</h3>
+          <ul>
+            {errors.map((error, index) => (
+              <li key={index}>{error}</li>
+            ))}
+          </ul>
         </div>
-    );
+      )}
+      <form onSubmit={handleSubmit}>
+      <label htmlFor="emailAddress">Email Address</label>
+      <input
+          id="emailAddress"
+          name="emailAddress"
+          type="email"
+          value={emailAddress}
+          onChange={(e) => setEmailAddress(e.target.value)}
+        />
+
+       <label htmlFor="password">Password</label>
+        <input
+          id="password"
+          name="password"
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+
+       <button className="button" type="submit">
+          Sign In
+        </button>
+
+        <button
+          className="button button-secondary"
+          onClick={() => navigate("/")}
+        >
+          Cancel
+        </button>
+      </form>
+      <p>
+     Need a user account? <a href="/signup">Sign up here</a>!
+      </p>
+    </div>
+  );
 };
 
-export default SignIn
+export default SignIn;

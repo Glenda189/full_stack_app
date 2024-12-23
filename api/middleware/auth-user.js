@@ -1,13 +1,14 @@
-const bcryptjs = require('bcryptjs');
-const { User } = require('../models');
+const bcryptjs = require('bcryptjs')
+const { User } = require('../models')
 
-// Middleware to authenticate authentication/ access
 const authenticateUser = async (req, res, next) => {
   try {
     const authorizationHeader = req.headers.authorization;
 
+    console.log("Authorization Header:", authorizationHeader);
+
     if (!authorizationHeader) {
-      return res.status(401).json({ message: 'Authorization header required' });
+      return res.status(401).json({ message: "Authorization header required" });
     }
     // Extract the encoded credentials from the Authorization header
     const base64Credentials = 
@@ -15,9 +16,12 @@ const authenticateUser = async (req, res, next) => {
     const credentials = Buffer.from(base64Credentials, 'base64').toString('ascii');
     const [emailAddress, password] = credentials.split(':');
 
+    console.log("Decoded Credentials:", emailAddress, password );
+
     // Find the user by email address
     const user = await User.findOne({ where: { emailAddress } });
     if (!user) {
+      console.log("User not found in database")
       return res.status(401).json({ message: 'Invalid credentials' });
     }
     // Compare the provided password by user with the stored hashed password

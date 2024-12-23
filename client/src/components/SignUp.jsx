@@ -1,5 +1,8 @@
+// Form for users to create account also sends user det to api and auto signs users 
+
+
 import { useState, useContext} from 'react';
-import { UserContext } from '../context/UserContext';
+import UserContext from "../context/UserContext";
 import { useNavigate } from 'react-router-dom';
 
 function SignUp() {
@@ -26,7 +29,8 @@ function SignUp() {
         });
         if (response.status === 201) {
             const user = await 
-           signIn(userEmail, userPassword);
+            // auto sign in when account is created 
+           signIn(userEmail, userPassword); 
             if(user) {
                 navigate('/');
             }
@@ -37,6 +41,9 @@ function SignUp() {
             alert('Sign Up failed.');
         }
     };
+
+
+    // Mockup example as provided 
     return (
         <div className="form--centered">
         <h2>Sign Up</h2>

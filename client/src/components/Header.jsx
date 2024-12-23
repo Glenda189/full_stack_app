@@ -1,31 +1,47 @@
-import {useContext} from 'react';
-import { UserContext } from "../context/UserContext";
+// displays the header with links to sign in and sign up and sign out 
 
-function Header() {
+import { useContext } from "react";
+import { Link } from "react-router-dom";
+import UserContext from "../context/UserContext";
+
+const Header = () => {
   const { authUser, signOut } = useContext(UserContext);
 
-  const handleSignOut = (e) => {
-    e.preventDefault();
+  const handleSignOut = () => {
+    console.log("Sign-out clicked");
     signOut();
   };
+
+
+  // Displays header links based on user auth stat 
   return (
     <header>
-      <div className="wrap header--flex">
-        <h1 className="header--logo"><a href="/">Courses</a></h1>
-        <nav>
+    <div className="wrap header--flex">
+      <h1 className="header--logo">
+        <Link to="/">Courses</Link>
+      </h1>
+      <nav>
         {authUser ? (
         <ul className="header--signedin">
            <li>Welcome, {authUser.firstName} {authUser.lastName}!</li>
-           <li><a href="/signout" onClick={handleSignOut}>Sign Out</a></li>
-           </ul>
+           <li>
+           <button onClick={handleSignOut} className="button button-secondary">
+                  Sign Out
+                </button>
+              </li>
+            </ul>
       ) : (
         <ul className="header--signedout">
-          <li><a href="/signup">Sign Up</a></li>
-          <li><a href="/signin">Sign In</a></li>
-          </ul>
-             )}
+         <li>
+                <Link to="/signup">Sign Up</Link>
+              </li>
+              <li>
+                <Link to="/signin">Sign In</Link>
+              </li>
+            </ul>
+          )}
         </nav>
-        </div>
+      </div>
     </header>
   );
 };
