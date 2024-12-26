@@ -1,6 +1,4 @@
 // sign in form for users to sign in 
-
-
 import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import UserContext from "../context/UserContext";
@@ -18,7 +16,8 @@ const SignIn = () => {
         const user = await signIn(emailAddress, password);
           if (user) {
           console.log("Sign-in successful:", user);
-          navigate("/"); // Redirect to homepage
+          navigate( location.state?.from?.pathname || "/")// Redirect to homepage or page user clicked 
+
         } else {
           setErrors(["Sign-in was unsuccessful. Please check your credentials."]);
         }
@@ -27,8 +26,6 @@ const SignIn = () => {
           navigate("/error"); // Redirect to error page
     }
   };
-
-
 
   // Mock up example as provided 
     return (

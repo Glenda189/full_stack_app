@@ -35,12 +35,25 @@ router.post('/', authenticateUser, asyncHandler(async (req, res) => {
       ...req.body, 
       userId: req.user.id 
     });
-    res.setHeader('Location', `/api/courses/${course.id}`);
-    res.status(201).end();
+
+    // Confirm course is created and ID is available
+    if (!course || !course.id) {
+      console.error("Course creation failed or ID missing.");
+      return res.status(500).json({ error: "Course creation failed." });
+    }
+
+    // Set Location header and send response
+    const location = `/api/courses/${course.id}`;
+    console.log("Setting Location header:", location); // Debug log
+    res.setHeader('Location', location);
+
+    console.log("Responding with 201 created and location header");
+    res.status(201).json({location});
   } catch (error) {
     if (error.name === 'SequelizeValidationError') {
       res.status(400).json({ errors: error.errors.map(err => err.message) });
     } else {
+      console.error("Unexpected error:", error); // Debug log for unexpected errors
       throw error;
     }
   }

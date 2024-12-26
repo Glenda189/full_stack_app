@@ -1,12 +1,11 @@
 import { useState, useContext } from "react";
-import UserContext  from "../context/UserContext";
+import UserContext from "../context/UserContext";
 import { useNavigate } from "react-router-dom";
 
 const CreateCourse = () => {
   const navigate = useNavigate();
-  const { authUser } = useContext(UserContext); // Access authenticated user from context
+  const { authUser } = useContext(UserContext);
 
-  // Form state variables
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [estimatedTime, setEstimatedTime] = useState("");
@@ -15,18 +14,14 @@ const CreateCourse = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
-    // Debug authUser
-    console.log("authUser context:", authUser);
-  
-    // Ensure user is authenticated
+
     if (!authUser || !authUser.emailAddress || !authUser.password) {
       setErrors(["Authorization failed: Missing user credentials."]);
       return;
     }
-  
+
     const encodedCredentials = btoa(`${authUser.emailAddress}:${authUser.password}`);
-  
+
     try {
       const res = await fetch("http://localhost:5000/api/courses", {
         method: "POST",
@@ -41,22 +36,28 @@ const CreateCourse = () => {
           materialsNeeded,
         }),
       });
-  
+
+      console.log("Response status:", res.status);
+
       if (res.status === 201) {
-        const location = res.headers.get("Location");
+        const location = res.headers.get("Location") || (await res.json()).location;
+        console.log("Location header:", location); // Debugging log
+
         if (location) {
+          console.log("Redirecting to:", location.replace("/api",""));
           navigate(location.replace("/api", ""));
         } else {
-          console.error("Missing Location header in API response");
-          navigate("/"); // Redirect to the homepage as a fallback
+          console.error("Missing Location header in API response.");
+          setErrors(["Unexpected error: Missing Location header."]);
+          navigate("/");
         }
       } else if (res.status === 400) {
         const data = await res.json();
-        setErrors(data.errors); // Display validation errors
+        setErrors(data.errors);
       } else if (res.status === 401) {
         setErrors(["You must be signed in to create a course."]);
       } else {
-        navigate("/error"); // Redirect to the error page for unexpected issues
+        navigate("/error");
       }
     } catch (err) {
       console.error("Error:", err);
@@ -70,17 +71,17 @@ const CreateCourse = () => {
 
   return (
     <div className="wrap">
-    <h2>Create Course</h2>
-    {errors.length > 0 && (
-      <div className="validation--errors">
-        <h3>Validation Errors</h3>
-        <ul>
-          {errors.map((error, index) => (
-            <li key={index}>{error}</li>
-          ))}
-        </ul>
-      </div>
-    )}
+      <h2>Create Course</h2>
+      {errors.length > 0 && (
+        <div className="validation--errors">
+          <h3>Validation Errors</h3>
+          <ul>
+            {errors.map((error, index) => (
+              <li key={index}>{error}</li>
+            ))}
+          </ul>
+        </div>
+      )}
       <form onSubmit={handleSubmit}>
         <div className="main--flex">
           <div>
@@ -91,24 +92,17 @@ const CreateCourse = () => {
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              required
             />
-           <p>
-              By {authUser ? `${authUser.firstName} ${authUser.lastName}` : "Unknown User"}
-            </p>
-
             <label htmlFor="courseDescription">Course Description</label>
             <textarea
               id="courseDescription"
               name="courseDescription"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              required
             />
           </div>
           <div>
-
-          <label htmlFor="estimatedTime">Estimated Time</label>
+            <label htmlFor="estimatedTime">Estimated Time</label>
             <input
               id="estimatedTime"
               name="estimatedTime"
@@ -125,7 +119,6 @@ const CreateCourse = () => {
             />
           </div>
         </div>
-
         <button className="button" type="submit">
           Create Course
         </button>
@@ -142,5 +135,6 @@ const CreateCourse = () => {
 };
 
 export default CreateCourse;
+
 
 

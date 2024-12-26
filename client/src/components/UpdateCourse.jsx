@@ -3,30 +3,35 @@ import { useParams, useNavigate } from "react-router-dom";
 import UserContext from "../context/UserContext";
 
 const UpdateCourse = () => {
-    const { id } = useParams();
-    const navigate = useNavigate();
-    const { authUser } = useContext(UserContext);
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const { authUser } = useContext(UserContext);
 
-// Form state variables
-const [course, setCourse] = useState(null);
-const [title, setTitle] = useState("");
-const [description, setDescription] = useState("");
-const [estimatedTime, setEstimatedTime] = useState("");
-const [materialsNeeded, setMaterialsNeeded] = useState("");
-const [errors, setErrors] = useState([]);
+  // Form state variables
+  const [course, setCourse] = useState(null);
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [estimatedTime, setEstimatedTime] = useState("");
+  const [materialsNeeded, setMaterialsNeeded] = useState("");
+  const [errors, setErrors] = useState([]);
 
-// Fetch course details
-useEffect(() => {
+  // Fetch course details
+  useEffect(() => {
     const fetchCourse = async () => {
       try {
         const res = await fetch(`http://localhost:5000/api/courses/${id}`);
         if (res.status === 200) {
           const data = await res.json();
-          setCourse(data);
-          setTitle(data.title);
-          setDescription(data.description);
-          setEstimatedTime(data.estimatedTime);
-          setMaterialsNeeded(data.materialsNeeded);
+          if (authUser?.id !== data.User.id) {
+            // Redirect to forbidden if the user doesn't own the course
+            navigate("/forbidden");
+          } else {
+            setCourse(data);
+            setTitle(data.title);
+            setDescription(data.description);
+            setEstimatedTime(data.estimatedTime);
+            setMaterialsNeeded(data.materialsNeeded);
+          }
         } else if (res.status === 404) {
           navigate("/notfound");
         } else {
@@ -38,9 +43,9 @@ useEffect(() => {
       }
     };
     fetchCourse();
-  }, [id, navigate]);
+  }, [id, navigate, authUser]);
 
-  // Handles when form submission
+  // Handles form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -48,6 +53,7 @@ useEffect(() => {
       navigate("/signin");
       return;
     }
+
     const { emailAddress, password } = authUser;
     const encodedCredentials = btoa(`${emailAddress}:${password}`);
 
@@ -65,6 +71,7 @@ useEffect(() => {
           materialsNeeded,
         }),
       });
+
       if (res.status === 204) {
         navigate(`/courses/${id}`); // Redirect to course detail page
       } else if (res.status === 400) {
@@ -86,12 +93,11 @@ useEffect(() => {
     navigate(`/courses/${id}`);
   };
 
+  // Return loading state if the course is not yet fetched
   if (!course) {
-    return <p>Loading...</p>; 
+    return <p>Loading...</p>;
   }
 
-
-  // mock up as provided 
   return (
     <div className="wrap">
       <h2>Update Course</h2>
@@ -116,7 +122,7 @@ useEffect(() => {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
             />
-             <p>
+            <p>
               By {authUser ? `${authUser.firstName} ${authUser.lastName}` : "Unknown User"}
             </p>
             <label htmlFor="courseDescription">Course Description</label>
@@ -136,14 +142,14 @@ useEffect(() => {
               value={estimatedTime}
               onChange={(e) => setEstimatedTime(e.target.value)}
             />
-<label htmlFor="materialsNeeded">Materials Needed</label>
+            <label htmlFor="materialsNeeded">Materials Needed</label>
             <textarea
               id="materialsNeeded"
               name="materialsNeeded"
               value={materialsNeeded}
               onChange={(e) => setMaterialsNeeded(e.target.value)}
             />
-            </div>
+          </div>
         </div>
         <button className="button" type="submit">
           Update Course
@@ -152,7 +158,8 @@ useEffect(() => {
           className="button button-secondary"
           type="button"
           onClick={handleCancel}
-        >Cancel
+        >
+          Cancel
         </button>
       </form>
     </div>
@@ -160,6 +167,3 @@ useEffect(() => {
 };
 
 export default UpdateCourse;
-
-
-
