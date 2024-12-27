@@ -1,11 +1,12 @@
 // sign in form for users to sign in 
 import { useState, useContext } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import UserContext from "../context/UserContext";
 
 const SignIn = () => {
     const { signIn } = useContext(UserContext);
     const navigate = useNavigate();
+    const location = useLocation();
     const [emailAddress, setEmailAddress] = useState("");
     const [password, setPassword] = useState("");
     const [errors, setErrors] = useState([]);
@@ -16,7 +17,7 @@ const SignIn = () => {
         const user = await signIn(emailAddress, password);
           if (user) {
           console.log("Sign-in successful:", user);
-          navigate( location.state?.from?.pathname || "/")// Redirect to homepage or page user clicked 
+          navigate( location.state?.from|| "/")// Redirect to homepage or page user clicked 
 
         } else {
           setErrors(["Sign-in was unsuccessful. Please check your credentials."]);
